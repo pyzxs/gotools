@@ -38,6 +38,11 @@ func StrToInt(e string) (int, error) {
 	return strconv.Atoi(e)
 }
 
+// IntToStr int转化为字符串
+func IntToStr(s int) string {
+	return strconv.Itoa(s)
+}
+
 // IdsStrToSlice 传递的"1,2,4"字符串转化为切片
 func IdsStrToSlice(id string) []int {
 	ids := make([]int, 0)
@@ -46,10 +51,6 @@ func IdsStrToSlice(id string) []int {
 	}
 
 	return ids
-}
-
-func IntToStr(s int) string {
-	return strconv.Itoa(s)
 }
 
 // JsonToMap json转化为map

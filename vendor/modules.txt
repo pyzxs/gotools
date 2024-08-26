@@ -13,6 +13,9 @@ github.com/oklog/ulid/v2
 # github.com/pmezard/go-difflib v1.0.0
 ## explicit
 github.com/pmezard/go-difflib/difflib
+# github.com/speps/go-hashids/v2 v2.0.1
+## explicit; go 1.14
+github.com/speps/go-hashids/v2
 # github.com/stretchr/testify v1.9.0
 ## explicit; go 1.17
 github.com/stretchr/testify/assert

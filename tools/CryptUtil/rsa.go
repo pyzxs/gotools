@@ -1,63 +1,152 @@
 package CryptUtil
 
 import (
+	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
+	"io"
 )
 
-const (
-	DEFAULT_PATH         = "./"
-	DEFAULT_PUBLIC_FILE  = "rsa_public_key.pem"
-	DEFAULT_PRIVATE_FILE = "rsa_private_key"
-)
-
-type RsaCert struct {
-	PrivateKey []byte
-	PublicKey  []byte
-}
-
-func NewRsaCertFromKey(publiKey, privateKey []byte) *RsaCert {
-	return &RsaCert{
-		PrivateKey: privateKey,
-		PublicKey:  publiKey,
+// RSAGenerateKey generate RSA private key
+func RSAGenerateKey(bits int, out io.Writer) error {
+	privateKey, err := rsa.GenerateKey(rand.Reader, bits)
+	if err != nil {
+		return err
 	}
+
+	X509PrivateKey := x509.MarshalPKCS1PrivateKey(privateKey)
+
+	privateBlock := pem.Block{Type: "RSA PRIVATE KEY", Bytes: X509PrivateKey}
+
+	return pem.Encode(out, &privateBlock)
 }
 
-// 公钥: 根据私钥生成
-// openssl rsa -in rsa_private_key.pem -pubout -out rsa_public_key.pem
-func (r *RsaCert) encrypt(origData []byte) ([]byte, error) {
-	//解密pem格式的公钥
-	block, _ := pem.Decode(r.PublicKey)
+// RSAGeneratePublicKey generate RSA public key
+func RSAGeneratePublicKey(priKey []byte, out io.Writer) error {
+	block, _ := pem.Decode(priKey)
 	if block == nil {
-		return nil, errors.New("public key error")
+		return errors.New("key is invalid format")
 	}
-	// 解析公钥
-	pubInterface, err := x509.ParsePKIXPublicKey(block.Bytes)
+
+	// x509 parse
+	privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	if err != nil {
+		return err
+	}
+	publicKey := privateKey.PublicKey
+	X509PublicKey, err := x509.MarshalPKIXPublicKey(&publicKey)
+	if err != nil {
+		return err
+	}
+
+	publicBlock := pem.Block{Type: "RSA PUBLIC KEY", Bytes: X509PublicKey}
+
+	return pem.Encode(out, &publicBlock)
+}
+
+// RSAEncrypt RSA encrypt
+func RSAEncrypt(src, pubKey []byte) ([]byte, error) {
+	block, _ := pem.Decode(pubKey)
+	if block == nil {
+		return nil, errors.New("key is invalid format")
+	}
+
+	// x509 parse
+	publicKeyInterface, err := x509.ParsePKIXPublicKey(block.Bytes)
 	if err != nil {
 		return nil, err
 	}
-	// 类型断言
-	pub := pubInterface.(*rsa.PublicKey)
-	//加密
-	return rsa.EncryptPKCS1v15(rand.Reader, pub, origData)
-}
 
-// 解密
-// openssl genrsa -out rsa_private_key.pem 1024
-func (r *RsaCert) Decrypt(ciphertext []byte) ([]byte, error) {
-	//解密
-	block, _ := pem.Decode(r.PrivateKey)
-	if block == nil {
-		return nil, errors.New("private key error!")
+	publicKey, ok := publicKeyInterface.(*rsa.PublicKey)
+	if !ok {
+		return nil, errors.New("the kind of key is not a rsa.PublicKey")
 	}
-	//解析PKCS1格式的私钥
-	priv, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	// encrypt
+	dst, err := rsa.EncryptPKCS1v15(rand.Reader, publicKey, src)
 	if err != nil {
 		return nil, err
 	}
-	// 解密
-	return rsa.DecryptPKCS1v15(rand.Reader, priv, ciphertext)
+
+	return dst, nil
+}
+
+// RSADecrypt RSA decrypt
+func RSADecrypt(src, priKey []byte) ([]byte, error) {
+	block, _ := pem.Decode(priKey)
+	if block == nil {
+		return nil, errors.New("key is invalid format")
+	}
+
+	// x509 parse
+	privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	if err != nil {
+		return nil, err
+	}
+
+	dst, err := rsa.DecryptPKCS1v15(rand.Reader, privateKey, src)
+	if err != nil {
+		return nil, err
+	}
+
+	return dst, nil
+}
+
+// RSASign RSA sign
+func RSASign(src []byte, priKey []byte, hash crypto.Hash) ([]byte, error) {
+	block, _ := pem.Decode(priKey)
+	if block == nil {
+		return nil, errors.New("key is invalid format")
+	}
+
+	// x509 parse
+	privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	if err != nil {
+		return nil, err
+	}
+
+	h := hash.New()
+	_, err = h.Write(src)
+	if err != nil {
+		return nil, err
+	}
+
+	bytes := h.Sum(nil)
+	sign, err := rsa.SignPKCS1v15(rand.Reader, privateKey, hash, bytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return sign, nil
+}
+
+// RSAVerify RSA verify
+func RSAVerify(src, sign, pubKey []byte, hash crypto.Hash) error {
+	block, _ := pem.Decode(pubKey)
+	if block == nil {
+		return errors.New("key is invalid format")
+	}
+
+	// x509 parse
+	publicKeyInterface, err := x509.ParsePKIXPublicKey(block.Bytes)
+	if err != nil {
+		return err
+	}
+
+	publicKey, ok := publicKeyInterface.(*rsa.PublicKey)
+	if !ok {
+		return errors.New("the kind of key is not a rsa.PublicKey")
+	}
+
+	h := hash.New()
+	_, err = h.Write(src)
+	if err != nil {
+		return err
+	}
+
+	bytes := h.Sum(nil)
+
+	return rsa.VerifyPKCS1v15(publicKey, hash, bytes, sign)
 }
