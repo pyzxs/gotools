@@ -9,8 +9,13 @@ import (
 )
 
 // StrToInt64 字符串转为为int43
-func StrToInt64(e string) (int64, error) {
-	return strconv.ParseInt(e, 10, 64)
+func StrToInt64(e string, defaultValue int64) (int64, error) {
+	v, err := strconv.ParseInt(e, 10, 64)
+	if err != nil {
+		return defaultValue, err
+	}
+
+	return v, nil
 }
 
 // Int64ToStr 整型64位转化为字符串
@@ -34,8 +39,12 @@ func Float32ToStr(e float32) string {
 }
 
 // StrToInt 字符串转化为int
-func StrToInt(e string) (int, error) {
-	return strconv.Atoi(e)
+func StrToInt(e string, defaultValue int) (int, error) {
+	v, err := strconv.Atoi(e)
+	if err != nil {
+		return defaultValue, err
+	}
+	return v, nil
 }
 
 // IntToStr int转化为字符串
@@ -51,6 +60,15 @@ func IdsStrToSlice(id string) []int {
 	}
 
 	return ids
+}
+
+// 字符串转Boolean型
+func StrToBoolean(str string) bool {
+	value, err := strconv.ParseBool(str)
+	if err != nil {
+		return false
+	}
+	return value
 }
 
 // JsonToMap json转化为map
@@ -86,8 +104,21 @@ func StructToMap(data interface{}) (map[string]interface{}, error) {
 	return mapData, nil
 }
 
+// 强制转化
+func ForceCovert(src any, dst interface{}) error {
+	b, err := json.Marshal(src)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(b, dst)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // ToDate 将日期字符串转换为 time.Time 对象
-func ToDate(dateStr string) (time.Time, error) {
+func StrToDate(dateStr string) (time.Time, error) {
 	// 定义日期格式
 	layout := "2006-01-02"
 	// 解析日期字符串
