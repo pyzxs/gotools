@@ -26,11 +26,11 @@ gotools是项目中“util”或者"tools"包友好的替代，它节省了开�
 
 *   [字符串工具](./tools/StrUtil/README.md)
 
-*  日期时间类
-* IP地址及网段
-* 唯一ID工具
-* Hash算法工具
-* 加解密工具
-* 验证码工具
-* ESCAPE工具
-* 16进制工具
+*  [日期时间类](./tools/TimeUtil/README.md)
+* [IP地址及网段](./tools/IPUtil/README.md)
+* [唯一ID工具](./tools/IdUtil/README.md)
+* [Hash算法工具](./tools/HashUtil/README.md)
+* [加解密工具](./tools/CryptUtil/README.md)
+* [验证码工具](./tools/CaptchaUtil/README.md)
+* [ESCAPE工具](./tools/EscapeUtil/README.md)
+* [16进制工具](./tools/HexUtil/README.md)
