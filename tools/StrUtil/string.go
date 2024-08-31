@@ -172,9 +172,3 @@ func Snake(s string) string {
 func Title(s string) string {
 	return strings.Title(s)
 }
-
-//func Ulid() string {
-//	t := time.Now().UTC()
-//	id := ulid.MustNew(ulid.Timestamp(t), nil)
-//	return id.String()
-//}
