@@ -1,1 +1,4 @@
 .idea
+.air.toml
+./tmp
+tmp

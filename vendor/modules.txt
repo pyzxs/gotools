@@ -4,6 +4,9 @@ github.com/bwmarrin/snowflake
 # github.com/davecgh/go-spew v1.1.1
 ## explicit
 github.com/davecgh/go-spew/spew
+# github.com/dchest/captcha v1.0.0
+## explicit; go 1.18
+github.com/dchest/captcha
 # github.com/google/uuid v1.6.0
 ## explicit
 github.com/google/uuid

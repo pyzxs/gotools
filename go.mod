@@ -12,6 +12,8 @@ require (
 	golang.org/x/text v0.17.0
 )
 
+require github.com/dchest/captcha v1.0.0 // indirect
+
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/lionsoul2014/ip2region/binding/golang v0.0.0-20240510055607-89e20ab7b6c6
