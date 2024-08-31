@@ -6,6 +6,7 @@
 - [HMAC](#HMAC)
 - [HASH](#HASH)
 - [BCRYPT](#BCRYPT)
+- [CTR](#CTR)
 
 
 ## Usage
@@ -118,4 +119,17 @@ HmacSha256ToString(key string, data string) string
 GenerateBcryptPassword(password string) ([]byte, error)
 // CompareHashAndPassword 验证加密密码和新输入验证
 CompareHashAndPassword(hashPassword string, password string) (bool, error)
+```
+
+### CTR
+
+```go
+source := "hello world"
+fmt.Println("原字符：", source)
+key := "1234567812345678"
+encryptCode, _ := AesCtrCrypt([]byte(source), []byte(key))
+fmt.Println("密文：", string(encryptCode))
+decryptCode, _ := AesCtrCrypt(encryptCode, []byte(key))
+fmt.Println("解密：", string(decryptCode))
+
 ```
