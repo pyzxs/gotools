@@ -1,4 +1,4 @@
-# CodeUtil 项目包
+# CaptchaUtil 项目包
 
 - [验证码](#CAPTCHA)
 
@@ -136,10 +136,3 @@ func main() {
 
 
 ![](../../resouce/captcha.png)
-
-### QRCODE
-
-
-
-
-### BARCODE
